@@ -1,4 +1,5 @@
 "use strict";
+// REWRITE CHECKWINNER TO NOT STRICT EQUAL LOGIC
 const displayInterface = {};
 const Gameboard = (function(){
     let board = [[false, false, false],
@@ -167,6 +168,7 @@ const GameFunctions = (function () {
         // play round
     function playRound(players, move){
         console.log("at least i'm here") 
+        displayInterface.clearDisplayStatus();
                 const currentPlayer = players.turn;
                 const row = move.row;
                 const col = move.col;
@@ -183,7 +185,11 @@ const GameFunctions = (function () {
                     Gameboard.clearBoard();
                     displayInterface.clearBoardContent();
                     displayInterface.updateDisplayScore(currentPlayer);
+                    displayInterface.updateDisplayStatus(result);
                 }, 100); 
+                // setTimeout(()=>{
+                //     displayInterface.clearDisplayStatus();
+                // }, 1)
                 } else {
                 console.log("i should change turns");
                 Players.changePlayerTurn(players);
@@ -205,8 +211,9 @@ const GameFunctions = (function () {
 
 const displayRegistration = (function () {
     const container = document.querySelector(".container");
+    const registration = displayRegistrationContent();
 
-    function displayRegistration () {
+    function displayRegistrationContent () {
         const registration = document.createElement("div");
         registration.classList.add("reg-container");
         const registrationRow1 = document.createElement("div");
@@ -260,15 +267,8 @@ const displayRegistration = (function () {
     return names;
    }
 
-   const registration = displayRegistration();
-
-   registration.buttonReg.addEventListener(("click"), () => {
-        const playersNames = getNames();
-        Players.createPlayers(playersNames);
-        displayGameContent();
-    })
-    // return{displayRegistration}
-})()
+    return{registration, getNames}
+})
 
 
 const displayGameContent = function () {
@@ -280,8 +280,8 @@ const displayGameContent = function () {
     const status = displayStatus();
     const scoreComponents = displayScore();
     const boardContainer = displayBoardContainer();
-    let cellClicked = false;
     const board = Gameboard.getBoard();
+    const newGameBtn = displayNewGameButton();
     displayBoardContent(board);
     GameFunctions.playGame(players);
 
@@ -353,6 +353,7 @@ const displayGameContent = function () {
     newGameBtn.classList.add("btn", "new-game");
     newGameBtn.textContent="New Game";
     container.appendChild(newGameBtn);
+    return newGameBtn
    }
 
    function clearDisplay(){
@@ -366,16 +367,26 @@ const displayGameContent = function () {
     })
    }   
 
-function updateDisplayScore(currentPlayer){
-    if (scoreComponents) {
-        const playerXScore = scoreComponents.scoreX;
-        const playerOScore = scoreComponents.scoreO;
-        // console.log(scoreComponents.scoreX)
-        if(currentPlayer.marker === "X"){
-            playerXScore.textContent = currentPlayer.score;
-        } else { playerOScore.textContent = currentPlayer.score;}
-      }
+
+
+function updateDisplayStatus(resultText){
+    console.log("Uuuupdating status")
+    status.textContent = resultText;
     }
+
+    function clearDisplayStatus(){
+        status.textContent = "";
+        }
+
+    function updateDisplayScore(currentPlayer){
+        
+            const playerXScore = scoreComponents.scoreX;
+            const playerOScore = scoreComponents.scoreO;
+            // console.log(scoreComponents.scoreX)
+            if(currentPlayer.marker === "X"){
+                playerXScore.textContent = currentPlayer.score;
+            } else { playerOScore.textContent = currentPlayer.score;}
+        }
  
     boardContainer.addEventListener("click", 
     function(event){
@@ -396,11 +407,41 @@ function updateDisplayScore(currentPlayer){
          }
         }
     )
+    console.log(newGameBtn)
+    newGameBtn.addEventListener("click", function () {
+        Gameboard.clearBoard();
+        clearBoardContent();
+        clearDisplay();
+        const regElements = displayRegistration();
+        const registration = regElements.registration;
+
+        registration.buttonReg.addEventListener(("click"), () => {
+        const playersNames = regElements.getNames();
+        Players.createPlayers(playersNames);
+        displayGameContent();
+    })
+    })
 
     displayInterface.clearBoardContent = clearBoardContent;
     displayInterface.updateDisplayScore = updateDisplayScore;
-return {displayStatus, displayScore, displayBoardContainer, displayNewGameButton, clearDisplay, updateDisplayScore, clearBoardContent}
+    displayInterface.updateDisplayStatus = updateDisplayStatus;
+    displayInterface.clearDisplayStatus = clearDisplayStatus;
+return {displayStatus, displayScore, displayBoardContainer, displayNewGameButton, clearDisplay, updateDisplayScore, updateDisplayStatus, clearBoardContent}
 }
+
+const Game = (function(){
+    const regElements = displayRegistration();
+    const registration = regElements.registration;
+
+   registration.buttonReg.addEventListener(("click"), () => {
+        const playersNames = regElements.getNames();
+        Players.createPlayers(playersNames);
+        displayGameContent();
+    })
+})();
+
+// write input check with limited max length, 
+// *** changeTurns;
 
 
 
