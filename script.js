@@ -5,31 +5,47 @@ const Gameboard = (function(){
     let board = [[false, false, false],
             [false, false, false],
             [false, false, false]];
-    const winBoards = {
-                one: [[true, false, false],
-                    [true, false, false],
-                    [true, false, false]],
-                two: [[false, true, false],
-                    [false, true, false],
-                    [false, true, false]],
-                three: [[false, false, true],
-                        [false, false, true],
-                        [false, false, true]],
-                four: [[true, true, true],
-                    [false, false, false],
-                    [false, false, false]],
-                five: [[false, false, false],
-                    [true, true, true],
-                    [false, false, false]],
-                six: [[false, false, false],
-                    [false, false, false],
-                    [true, true, true]],
-                seven: [[true, false, false],
-                        [false, true, false],
-                        [false, false, true]],
-                eight: [[false, false, true],
-                        [false, true, false],
-                        [true, false, false]]
+            const winCells = {
+                one: [
+                    {row: 0, col: 0},
+                    {row: 1, col: 0},
+                    {row: 2, col: 0}
+                ], 
+                two: [
+                    {row: 0, col: 1},
+                    {row: 1, col: 1},
+                    {row: 2, col: 1}
+                ], 
+                three: [
+                    {row: 0, col: 2},
+                    {row: 1, col: 2},
+                    {row: 2, col: 2}
+                ], 
+                four: [
+                    {row: 0, col: 0},
+                    {row: 0, col: 1},
+                    {row: 0, col: 2}
+                ], 
+                five: [
+                    {row: 1, col: 0},
+                    {row: 1, col: 1},
+                    {row: 1, col: 2}
+                ], 
+                six: [
+                    {row: 2, col: 0},
+                    {row: 2, col: 1},
+                    {row: 2, col: 2}
+                ], 
+                seven: [
+                    {row: 0, col: 0},
+                    {row: 1, col: 1},
+                    {row: 2, col: 2}
+                ], 
+                eight: [
+                    {row: 0, col: 2},
+                    {row: 1, col: 1},
+                    {row: 2, col: 0}
+                ] 
             };
 
     function clearBoard(){
@@ -74,8 +90,8 @@ const Gameboard = (function(){
     const getBoard = function(){
         console.log(board);
          return board}
-    const getWinBoards = function(){return winBoards}
-    return {getBoard, getWinBoards, checkBoardFilled, boardToBinary, setMark, clearBoard};
+    const getWinCells = function(){return winCells}
+    return {getBoard, getWinCells, checkBoardFilled, boardToBinary, setMark, clearBoard};
 })();
 
 
@@ -143,18 +159,19 @@ const GameFunctions = (function () {
     function checkResult(player){
         const boardState = Gameboard.boardToBinary(player.marker);
         console.log(boardState)
-        const winBoards = Gameboard.getWinBoards();
+        const winCells = Gameboard.getWinCells();
         const boardFilled = Gameboard.checkBoardFilled();
         // console.log(winBoards);
         let win = false;
         let resultText = "";
-        for (const winBoard in winBoards) {
-            if (JSON.stringify(winBoards[winBoard]) === JSON.stringify(boardState)){
+        for (const pattern in winCells) {
+            const positions = winCells[pattern];
+            if (positions.every(pos => boardState[pos.row][pos.col] === true)) {
                 win = true;
                 player.incrementScore();
-                console.log(winBoards[winBoard]);
+                // console.log(winBoards[winBoard]);
                 console.log("I'm in win if")
-                resultText = `${player.name} wins`;
+                resultText = `${player.name} won`;
             }
         }
             if (boardFilled && !win){
