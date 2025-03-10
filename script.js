@@ -1,5 +1,4 @@
 "use strict";
-// REWRITE CHECKWINNER TO NOT STRICT EQUAL LOGIC
 const displayInterface = {};
 const Gameboard = (function(){
     let board = [[false, false, false],
@@ -52,12 +51,10 @@ const Gameboard = (function(){
         board = [[false, false, false],
             [false, false, false],
             [false, false, false]];
-            console.log("cleared")
         }
 
     function boardToBinary(mark){
         const boardBinary = structuredClone(board);
-        // console.log(boardBinary);
         for (let row = 0; row < 3; row++) {
             for (let col = 0; col < 3; col++){
                 if (boardBinary[row][col] === mark){
@@ -65,15 +62,11 @@ const Gameboard = (function(){
                 } else{boardBinary[row][col] = false}
             }
         }
-        // console.log(boardBinary);
         return boardBinary;
     }
 
     const checkBoardFilled = function(){
         const boardContent = [].concat(...board);
-        // console.log(board)
-        // console.log(boardContent)
-        // console.log(boardContent.includes(undefined))
         const boardFilled = boardContent.includes(false) ? false : true;
         return boardFilled;
     }
@@ -84,11 +77,9 @@ const Gameboard = (function(){
         } else {
             return
         }
-        console.log(board[row][col])
     };
 
     const getBoard = function(){
-        console.log(board);
          return board}
     const getWinCells = function(){return winCells}
     return {getBoard, getWinCells, checkBoardFilled, boardToBinary, setMark, clearBoard};
@@ -108,7 +99,6 @@ const Players = (function () {
     Player.prototype.makeMove = function (row, col){
         row = parseInt(row);
         col = parseInt(col);
-        console.log({row, col})
         Gameboard.setMark(row, col, this.marker)
     }
     Player.prototype.incrementScore = function(){
@@ -119,7 +109,6 @@ const Players = (function () {
     }
             // initialize players
     function createPlayers(names){
-        console.log(names)
         const nameX = names[0];
         const nameO = names[1];
         const playerX = new Player(nameX, true);
@@ -137,14 +126,12 @@ const Players = (function () {
     };
 
     function changePlayerTurn(players){
-        console.log(players.turn === players.X)
         if (players.turn === players.X){
             players.turn = players.O
         } else players.turn = players.X
     }
 
     function setFistTurn(players){
-        console.log(players.X)
         players.turn = players.X
     }
 
@@ -154,14 +141,11 @@ return {createPlayers, getPlayers, changePlayerTurn, setFistTurn}
 
 
 const GameFunctions = (function () {
-    // const players = Players.getPlayers();
         // check
     function checkResult(player){
         const boardState = Gameboard.boardToBinary(player.marker);
-        console.log(boardState)
         const winCells = Gameboard.getWinCells();
         const boardFilled = Gameboard.checkBoardFilled();
-        // console.log(winBoards);
         let win = false;
         let resultText = "";
         for (const pattern in winCells) {
@@ -169,13 +153,11 @@ const GameFunctions = (function () {
             if (positions.every(pos => boardState[pos.row][pos.col] === true)) {
                 win = true;
                 player.incrementScore();
-                // console.log(winBoards[winBoard]);
-                console.log("I'm in win if")
-                resultText = `${player.name} won`;
+                resultText = `${player.name} won!`;
             }
         }
             if (boardFilled && !win){
-                resultText = "It's a draw"
+                resultText = "It's a draw!"
             } else if (!boardFilled && !win){
                 resultText = false; 
             }
@@ -184,45 +166,29 @@ const GameFunctions = (function () {
 
         // play round
     function playRound(players, move){
-        console.log("at least i'm here") 
         displayInterface.clearDisplayStatus();
                 const currentPlayer = players.turn;
                 const row = move.row;
                 const col = move.col;
                 currentPlayer.makeMove(row, col);
                 let result = checkResult(currentPlayer);
-                console.log({result});
                 if (result !== false){ 
                 setTimeout(() => {
                     let scoreX = players.X.score;
                     let scoreO = players.O.score;
-                    // alert("Round ended")
-                    console.log({scoreX, scoreO})
                     Players.setFistTurn(players);
                     Gameboard.clearBoard();
                     displayInterface.clearBoardContent();
                     displayInterface.updateDisplayScore(currentPlayer);
                     displayInterface.updateDisplayStatus(result);
                 }, 100); 
-                // setTimeout(()=>{
-                //     displayInterface.clearDisplayStatus();
-                // }, 1)
+            
                 } else {
-                console.log("i should change turns");
                 Players.changePlayerTurn(players);
                 }            
         }
-        
-        const playGame = function(players){
-            console.log(players)
-         //    let wantsToPlay = true;
-         //     while(wantsToPlay){
-         //     GameFunctions.playRound(players)
-         //     Gameboard.clearBoard();
-         //     }
-         }
 
- return{playRound, playGame}
+ return{playRound}
 })();
 
 
@@ -231,6 +197,11 @@ const displayRegistration = (function () {
     const registration = displayRegistrationContent();
 
     function displayRegistrationContent () {
+        const toast = document.createElement("div");
+        toast.classList.add("warning", "hidden");
+        toast.textContent = "";
+        container.appendChild(toast);
+
         const registration = document.createElement("div");
         registration.classList.add("reg-container");
         const registrationRow1 = document.createElement("div");
@@ -245,6 +216,7 @@ const displayRegistration = (function () {
         inputX.name = "x-player";
         inputX.id = "x-player";
         inputX.required=true;
+        inputX.maxLength = 12;
         registrationRow1.appendChild(labelX);
         registrationRow1.appendChild(inputX);
 
@@ -255,6 +227,7 @@ const displayRegistration = (function () {
         inputO.name = "o-player";
         inputO.id = "o-player";
         inputO.required=true;
+        inputO.maxLength = 12;
         registrationRow2.appendChild(labelO);
         registrationRow2.appendChild(inputO);
 
@@ -262,51 +235,64 @@ const displayRegistration = (function () {
         registration.appendChild(registrationRow2);
 
         const buttonReg = document.createElement("button");
-        buttonReg.classList=("btn", "reg-btn");
+        buttonReg.classList.add("btn", "reg-btn");
         buttonReg.textContent="Play";
 
         registration.appendChild(buttonReg);
         container.appendChild(registration);
         return{inputX, inputO, buttonReg}
     }
-    //    function checkInputs(){
-//     let isValid = false;
-//     if (registration.inputX.value!==""){
-//         registration.inputX.
-//     }
-//     }
-//    }
+    function showToast(message = "Type players names!", duration = 2000){
+        const toast = document.querySelector(".warning");
+        toast.textContent = message;
+        toast.classList.remove("hidden");
+        setTimeout(()=> toast.classList.add("show"), 50); 
+      
+        setTimeout(()=>{
+          toast.classList.remove("show");
+          setTimeout(() => toast.classList.add("hidden"), 400); 
+        }, duration);
+    }
+
+    function checkInputs(){
+        if (registration.inputX.value==="" ||  registration.inputX.value===""){
+        showToast();
+            return false;
+        } else return true;
+    }
+
    function getNames(){
     const nameX = registration.inputX.value;
     const  nameO = registration.inputO.value;
     const names = [nameX, nameO]
-    console.log(names)
     return names;
    }
 
-    return{registration, getNames}
+    return{registration, getNames, checkInputs}
 })
 
 
 const displayGameContent = function () {
     const container = document.querySelector(".container");
+    const gameContentContainer = document.createElement("div");
+    gameContentContainer.classList="game-cont-container";
     // when function called create interface
     const players = Players.getPlayers();
-    console.log(players)
     clearDisplay();
     const status = displayStatus();
     const scoreComponents = displayScore();
     const boardContainer = displayBoardContainer();
     const board = Gameboard.getBoard();
     const newGameBtn = displayNewGameButton();
+    container.appendChild(gameContentContainer);
     displayBoardContent(board);
-    GameFunctions.playGame(players);
+
 
 
   function displayStatus () {
     const statusContainer = document.createElement("div");
     statusContainer.classList.add("status-container");
-    container.appendChild(statusContainer);
+    gameContentContainer.appendChild(statusContainer);
     return statusContainer;
   }
    function displayScore(){
@@ -316,6 +302,8 @@ const displayGameContent = function () {
     const playerX = document.createElement("div");
     playerX.classList.add("x-name");
     playerX.textContent = players.X.name;
+    const scoreBox = document.createElement("div");
+    scoreBox.classList ="score-box";
     const scoreX = document.createElement("div");
     scoreX.classList.add("x-score");
     scoreX.textContent = players.X.score;
@@ -328,12 +316,13 @@ const displayGameContent = function () {
     const playerO = document.createElement("div");
     playerO.classList.add("o-name");
     playerO.textContent = players.O.name;
-   scoreContainer.appendChild(playerX)
-   scoreContainer.appendChild(scoreX);
-   scoreContainer.appendChild(colon);
-   scoreContainer.appendChild(scoreO);
+   scoreContainer.appendChild(playerX);
+   scoreBox.appendChild(scoreX);
+   scoreBox.appendChild(colon);
+   scoreBox.appendChild(scoreO);
+   scoreContainer.appendChild(scoreBox);
    scoreContainer.appendChild(playerO);
-   container.appendChild(scoreContainer);
+   gameContentContainer.appendChild(scoreContainer);
    return{scoreContainer, playerX, scoreX, scoreO, playerO}
    }
 
@@ -350,15 +339,13 @@ const displayGameContent = function () {
                 gameContainer.appendChild(cell);
             }
         }
-    container.appendChild(gameContainer);
+        gameContentContainer.appendChild(gameContainer);
     return gameContainer;
    }
 
    function displayBoardContent(board){
-    console.log(board)
     const cells = boardContainer.querySelectorAll(".cell");
     cells.forEach((cell) => {
-        console.log(cell);
         const row = cell.dataRow;
         const col = cell.dataCol;
         cell.textContent = (board[row][col] === false) ? " " : board[row][col];
@@ -369,7 +356,7 @@ const displayGameContent = function () {
     const newGameBtn = document.createElement("button");
     newGameBtn.classList.add("btn", "new-game");
     newGameBtn.textContent="New Game";
-    container.appendChild(newGameBtn);
+    gameContentContainer.appendChild(newGameBtn);
     return newGameBtn
    }
 
@@ -381,13 +368,17 @@ const displayGameContent = function () {
     const cells = boardContainer.querySelectorAll(".cell");
     cells.forEach((cell) => {
         cell.textContent = " ";
+        cell.classList.remove("X", "O")
     })
    }   
 
 
 
 function updateDisplayStatus(resultText){
-    console.log("Uuuupdating status")
+    
+    status.classList.remove("fade-animation"); 
+    void status.offsetWidth;
+    status.classList.add("fade-animation");
     status.textContent = resultText;
     }
 
@@ -399,7 +390,6 @@ function updateDisplayStatus(resultText){
         
             const playerXScore = scoreComponents.scoreX;
             const playerOScore = scoreComponents.scoreO;
-            // console.log(scoreComponents.scoreX)
             if(currentPlayer.marker === "X"){
                 playerXScore.textContent = currentPlayer.score;
             } else { playerOScore.textContent = currentPlayer.score;}
@@ -419,12 +409,13 @@ function updateDisplayStatus(resultText){
         if (cell.classList.contains("cell")){
             if(cell.textContent === " "){
                 cell.textContent = currentPlayer.marker;
+                cell.classList.add(currentPlayer.marker)
                GameFunctions.playRound(players, move);
             }
          }
         }
     )
-    console.log(newGameBtn)
+   
     newGameBtn.addEventListener("click", function () {
         Gameboard.clearBoard();
         clearBoardContent();
@@ -433,9 +424,12 @@ function updateDisplayStatus(resultText){
         const registration = regElements.registration;
 
         registration.buttonReg.addEventListener(("click"), () => {
+        const validInputs = regElements.checkInputs();
+        if(validInputs){
         const playersNames = regElements.getNames();
         Players.createPlayers(playersNames);
         displayGameContent();
+        }
     })
     })
 
@@ -449,11 +443,13 @@ return {displayStatus, displayScore, displayBoardContainer, displayNewGameButton
 const Game = (function(){
     const regElements = displayRegistration();
     const registration = regElements.registration;
-
    registration.buttonReg.addEventListener(("click"), () => {
+    const validInputs = regElements.checkInputs();
+        if(validInputs){
         const playersNames = regElements.getNames();
         Players.createPlayers(playersNames);
         displayGameContent();
+        }
     })
 })();
 
