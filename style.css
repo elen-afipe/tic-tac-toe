@@ -66,25 +66,31 @@ body {
   --green: #00ff33;
   --pink-purple: #9c1e9c;
 }
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: black;
+}
     /*style  */
   .container{
+    border: 10px solid #231346;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    width:  1000px;
+    height: 600px;
     background-image: url("./imgs/background.png");
     background-size: cover;
     background-position: center;
-    justify-content: flex-start;
+    justify-content: flex-end;
     align-items: center;
   }
 
   .warning{
-    position:fixed;
-    margin-top: 15px;
+    margin-bottom: 180px;
     width: 350px;
-    top: 20px;
-    left: 50%;
-    transform: translate(-50%, -50%);
     border: 2px solid var(--white);
     padding:15px;
     border-radius:8px;
@@ -101,10 +107,11 @@ body {
   }
   
   .reg-container{
-    padding-top: 400px;
+    padding-bottom: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: end;
   }
 
 .reg-row{
@@ -138,14 +145,13 @@ input{
 .game-cont-container{
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: flex-end;
   align-items: center;
   font-size: 14px;
 }
 .status-container{
-  margin-top: 20px;
+    margin-bottom: 140px;
   min-height: 1.5rem;
-  margin-bottom: 15px;
   text-shadow: var(--blue) 1px -1px 8px,
   var(--blue) -1px -1px 8px,
   var(--blue) -1px 1px 8px,
@@ -162,7 +168,7 @@ input{
 }
 
 .score-container{
-  margin-top: 180px;
+  margin-bottom: -45px;
   padding: 5px;
   display: flex;
   gap:25px;
@@ -209,9 +215,10 @@ input{
     grid-template-columns:  7.5rem 7.5rem 7.5rem;
     gap: 2px;
     background: linear-gradient(#2e2672, #0d032d);
-    transform: perspective(445px) rotateX(66deg);
+    transform: perspective(445px) rotateX(62deg);
     box-shadow:  0px 1px 8px 6px var(--blue);
-    margin-bottom: 0px;
+    margin-bottom: -50px;
+    scale: 0.7
 }
 
 .cell{
@@ -241,6 +248,7 @@ input{
 }
 
 .btn.new-game{
+  margin-bottom: 20px;
   margin-top: 0px;
   transform: perspective(50px) rotateX(8deg);
 }
